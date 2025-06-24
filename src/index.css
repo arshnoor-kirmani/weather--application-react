@@ -1,1 +1,39 @@
 @import "tailwindcss";
+@theme {
+  --color-shades-5: #eae0d5;
+  --color-shades-4: #c6ac8e;
+  --color-shades-3: #5e503f;
+  --color-shades-2: #22333b;
+  --color-shades-1: #0a0908;
+}
+/* main */
+
+.main-mobile {
+  @apply p-3 pb-[8.1vh];
+}
+.main-md {
+  @apply md:p-8 pb-[8.1vh];
+}
+.main-lg {
+  @apply lg:p-20 lg:py-15 pb-[8.1vh];
+}
+/* weather container */
+.container-mobile {
+  @apply w-full h-[8vh]  p-1 border-t fixed;
+}
+.container-lg {
+  @apply lg:size-full lg:relative;
+}
+/* nav */
+.nav-mobile {
+  @apply grid-rows-1 grid-cols-1;
+}
+.nav-lg {
+  @apply lg:grid-cols-1 lg:grid-rows-[10%_90%] lg:gap-3 lg:pt-3;
+}
+nav #logo {
+  @apply hidden lg:grid;
+}
+nav #nav-links {
+  @apply lg:flex-col;
+}
