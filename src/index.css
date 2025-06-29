@@ -9,10 +9,10 @@
 /* main */
 
 .main-mobile {
-  @apply p-3 pb-[8.1vh];
+  @apply p-3 pb-[8.1vh] h-[225dvh] border-3;
 }
 .main-md {
-  @apply md:p-8 pb-[8.1vh];
+  @apply md:p-8 pb-[8.1vh] md:h-full;
 }
 .main-lg {
   @apply lg:p-20 lg:py-15 pb-[8.1vh];
