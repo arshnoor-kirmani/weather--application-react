@@ -1,5 +1,4 @@
 import axios from "axios";
-import { setCurrentWeather } from "../app/weatherInfo/CurrentWeatherSlice";
 // Current Section initial object
 let current = {
   generationtime_ms: null,
@@ -10,7 +9,7 @@ let current = {
   location: {
     lon: null,
     lat: null,
-    name: null,
+    city: null,
     country: null,
     country_code: null,
   },
@@ -84,13 +83,14 @@ let current = {
     ],
   },
 };
-function fetchCurrentWeather(dispatch) {
+async function fetchCurrentWeather(coord, dispatch, Function) {
   try {
     const Base_Url = `https://api.open-meteo.com/v1/forecast`;
+    // const Base_Url = `./dev_asserts/`;
     //current weather params
     const params = {
-      latitude: 26.8393,
-      longitude: 80.9231,
+      latitude: coord.lat,
+      longitude: coord.lon,
       current_weather_param: [
         "temperature_2m",
         "relative_humidity_2m",
@@ -116,6 +116,7 @@ function fetchCurrentWeather(dispatch) {
       timezone: "auto",
     };
     function getCurrentWeatherUrl() {
+      // return `${Base_Url}current.json`; //remove this line before deploy
       return `${Base_Url}?latitude=${params.latitude}&longitude=${
         params.longitude
       }&current=${params.current_weather_param.join(",")}&timezone=${
@@ -123,6 +124,7 @@ function fetchCurrentWeather(dispatch) {
       }&past_days=${params.past_days}`;
     }
     function getHourlyWeatherUrl() {
+      // return `${Base_Url}hourly.json`; //remove this line before deploy
       return `${Base_Url}?latitude=${params.latitude}&longitude=${
         params.longitude
       }&hourly=${params.hourly_weather_param.join(",")}&timezone=${
@@ -130,6 +132,8 @@ function fetchCurrentWeather(dispatch) {
       }&past_days=${params.past_days}`;
     }
     function getWeeklyWeatherUrl() {
+      // return `${Base_Url}test.json`; //remove this line before deploy
+
       return `${Base_Url}?latitude=${params.latitude}&longitude=${
         params.longitude
       }&daily=${params.week_weather_param.join(",")}&timezone=${
@@ -191,6 +195,7 @@ function fetchCurrentWeather(dispatch) {
       };
       return weatherMap[code] || { main: "Unknown", disc: "Unknown" };
     }
+
     // Fetching current weather data
     const currentWeatherUrl = getCurrentWeatherUrl();
     const fetchCurrentWeatherData = async (currentWeatherUrl) => {
@@ -207,9 +212,6 @@ function fetchCurrentWeather(dispatch) {
           location: {
             lon: data.longitude ?? "N/A",
             lat: data.latitude ?? "N/A",
-            name: data.location_name ?? "N/A",
-            country: data.country ?? "N/A",
-            country_code: data.country_code ?? "N/A",
           },
           current_weather: {
             units: data.current_units ?? {},
@@ -236,7 +238,10 @@ function fetchCurrentWeather(dispatch) {
               },
               clouds: { all: "N/A" },
               time: currentData.time
-                ? new Date(currentData.time).toLocaleTimeString("en-US")
+                ? new Date(currentData.time).toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })
                 : "N/A",
               interval: currentData.time
                 ? new Date(currentData.time).toLocaleDateString("en-US")
@@ -248,10 +253,16 @@ function fetchCurrentWeather(dispatch) {
               precipitation: currentData.precipitation ?? 0,
               rain: currentData.rain ?? 0,
               sunset: currentData.sunset
-                ? new Date(currentData.sunset).toLocaleTimeString("en-US")
+                ? new Date(currentData.sunset).toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })
                 : "N/A",
               sunrise: currentData.sunrise
-                ? new Date(currentData.sunrise).toLocaleTimeString("en-US")
+                ? new Date(currentData.sunrise).toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })
                 : "N/A",
             },
             dt: {
@@ -259,11 +270,16 @@ function fetchCurrentWeather(dispatch) {
                 ? new Date(currentData.time).toLocaleDateString("en-US")
                 : "N/A",
               time: currentData.time
-                ? new Date(currentData.time).toLocaleTimeString("en-US")
+                ? new Date(currentData.time).toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })
                 : "N/A",
               wish: getWish(currentData.time),
               day: currentData.time
-                ? new Date(currentData.time).toLocaleDateString("en-US")
+                ? new Date(currentData.time).toLocaleDateString("en-US", {
+                    weekday: "short",
+                  })
                 : "N/A",
             },
             success: true,
@@ -276,6 +292,7 @@ function fetchCurrentWeather(dispatch) {
         return { error: true, message: err.message };
       }
     };
+
     fetchCurrentWeatherData(currentWeatherUrl)
       // Fetching hourly weather data
       .then((currentWeatherData) => {
@@ -294,27 +311,102 @@ function fetchCurrentWeather(dispatch) {
         const is_day = hourlyData.hourly?.is_day || [];
         const hourlyWeather = {
           units: hourlyData.hourly_units || {},
-          hourly: times.map((item, idx) => ({
-            time: item ? new Date(item).toLocaleTimeString("en-US") : "N/A",
-            dt: {
-              date: item ? new Date(item).toLocaleDateString("en-US") : "N/A",
-              time: item ? new Date(item).toLocaleTimeString("en-US") : "N/A",
-              wish: getWish(item),
-              day: item ? new Date(item).toLocaleDateString("en-US") : "N/A",
-            },
-            weather: {
-              temperature_2m: temperature_2m[idx] ?? "N/A",
-              weather_code: weather_code[idx] ?? "N/A",
-              is_day:
-                typeof is_day[idx] === "number" ? is_day[idx] === 1 : "N/A",
-            },
-          })),
+          hourly: times
+            .map((item, idx) => {
+              let date = new Date(item).toLocaleDateString("en-US");
+              // Only include hours for the current day and every 3 hours
+              // Only include hours from current time onwards, and every hour
+              const currentDate = current.current_weather.dt.date;
+              const currentTime = current.current_weather.dt.time;
+              const itemDate = date;
+              const itemTime = item
+                ? new Date(item).toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })
+                : "N/A";
+              // Compare dates and times
+              if (
+                itemDate > currentDate ||
+                (itemDate === currentDate && itemTime >= currentTime)
+              ) {
+                return {
+                  time: item
+                    ? new Date(item).toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        // hour12: true, // Add AM/PM
+                      })
+                    : "N/A",
+                  dt: {
+                    date: item
+                      ? new Date(item).toLocaleDateString("en-US")
+                      : "N/A",
+                    time: item
+                      ? new Date(item).toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                          // hour12: true, // Add AM/PM
+                        })
+                      : "N/A",
+                    wish: getWish(item),
+                    day: item
+                      ? new Date(item).toLocaleDateString("en-US", {
+                          weekday: "short",
+                        })
+                      : "N/A",
+                  },
+                  weather: {
+                    temp: temperature_2m[idx] ?? "N/A",
+                    weather_main:
+                      getWeatherMainAndDescription(weather_code[idx]).main ||
+                      "N/A",
+                    weather_code: weather_code[idx] ?? "N/A",
+                    is_day:
+                      typeof is_day[idx] === "number"
+                        ? is_day[idx] === 1
+                        : "N/A",
+                  },
+                };
+              }
+              return undefined;
+            })
+            .filter(Boolean),
         };
         // Merge the hourly weather data with the current object
         current.hourly_weather = hourlyWeather;
 
         // Fetch weekly weather data
         return fetchWeeklyData();
+      })
+      .finally(() => {
+        console.log("SuccesFully Data Fetch");
+        console.log("Fetch", current);
+        if (dispatch) {
+          let locationData;
+          async function getLocationinfo(lat, lon) {
+            try {
+              const response = await axios.get(
+                `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`
+              );
+              locationData = response.data;
+              console.log(current.location);
+              current.location = {
+                ...current.location,
+                city: locationData?.address.city ?? "N/A",
+                country: locationData?.address.country ?? "N/A",
+                country_code: locationData?.address.country_code ?? "N/A",
+              };
+            } catch (err) {
+              console.error(err);
+              locationData = null;
+            }
+            console.log("location", locationData);
+          }
+          getLocationinfo(params.latitude, params.longitude).finally(() => {
+            dispatch(Function(current));
+          });
+        }
       })
       .catch(() => {});
 
@@ -336,23 +428,36 @@ function fetchCurrentWeather(dispatch) {
         current.week_weather = {
           units: data.daily_units || {},
           weekly_data: times.map((item, idx) => ({
-            time: item ? new Date(item).toLocaleTimeString("en-US") : "N/A",
+            time: item
+              ? new Date(item).toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })
+              : "N/A",
             dt: {
               date: item ? new Date(item).toLocaleDateString("en-US") : "N/A",
-              time: item ? new Date(item).toLocaleTimeString("en-US") : "N/A",
+              time: item
+                ? new Date(item).toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })
+                : "N/A",
               wish: getWish(item),
-              day: item ? new Date(item).toLocaleDateString("en-US") : "N/A",
+              day: item
+                ? new Date(item).toLocaleDateString("en-US", {
+                    weekday: "short",
+                  })
+                : "N/A",
             },
             weather: {
               temperature_2m_max: temperature_2m_max[idx] ?? "N/A",
               temperature_2m_min: temperature_2m_min[idx] ?? "N/A",
               weather_code: weather_code[idx] ?? "N/A",
+              weather_main:
+                getWeatherMainAndDescription(weather_code[idx]).main || "N/A",
             },
           })),
         };
-        if (dispatch) {
-          dispatch(setCurrentWeather(current));
-        }
         return current.week_weather;
       } catch (err) {
         console.log(err);
@@ -360,9 +465,6 @@ function fetchCurrentWeather(dispatch) {
       }
     }
     // Only dispatch if dispatch is provided
-    if (dispatch) {
-      dispatch(setCurrentWeather(current));
-    }
   } catch (error) {}
   return {};
 }

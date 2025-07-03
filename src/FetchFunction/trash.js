@@ -261,7 +261,7 @@ const fetchCurrentWeather = async (dispatch) => {
       dt: {
         date: new Date(response?.current?.time).toLocaleDateString("en-US"),
         day: new Date(response?.current?.time).toLocaleDateString("en-US", {
-          weekday: "long",
+          weekday: "shot",
         }),
         time: new Date(response?.current?.time).toLocaleTimeString([], {
           hour: "2-digit",

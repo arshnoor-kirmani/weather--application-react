@@ -4,11 +4,11 @@ const initialState = {
   loading: true,
 };
 
-const Currentweather = createSlice({
-  name: "currentweather",
+const CitesWeatherSlice = createSlice({
+  name: "citeweather",
   initialState,
   reducers: {
-    setCurrentWeather: (state, action) => {
+    setCitesWeather: (state, action) => {
       Object.assign(state, action.payload);
       state.success = true;
       state.loading = false;
@@ -16,5 +16,5 @@ const Currentweather = createSlice({
     },
   },
 });
-export const { setCurrentWeather } = Currentweather.actions;
-export default Currentweather.reducer;
+export const { setCitesWeather } = CitesWeatherSlice.actions;
+export default CitesWeatherSlice.reducer;
