@@ -16,16 +16,18 @@ export default function CurrentWeather() {
     distance: "km",
   };
   useEffect(() => {
-    fetchCurrentWeather(
-      {
-        lat: 26.8393,
-        lon: 80.9231,
-      },
-      dispatch,
-      setCurrentWeather
-    ).finally(() => {
-      console.log("After Function Call", weatherData);
-    });
+    if (!weatherData?.current_weather?.dt?.time) {
+      fetchCurrentWeather(
+        {
+          lat: 26.8393,
+          lon: 80.9231,
+        },
+        dispatch,
+        setCurrentWeather
+      ).finally(() => {
+        console.log("After Function Call", weatherData);
+      });
+    }
   }, []);
   // useEffect(() => {}, [weatherData]);
   if (weatherData.loading) {

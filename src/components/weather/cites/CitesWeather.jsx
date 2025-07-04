@@ -35,48 +35,46 @@ export default function CitesWeather() {
         >
           <div className=" size-full">
             <ul className="grid grid-cols-1 grid-rows-2 gap-3 size-full ">
-              <li className="flex justify-between items-center px-2 py-3  border-shades-5 bg-shades-1/30 text-shades-5/90 rounded-xl ">
-                <div>
-                  <h1 className="text-xl capitalize grid gap-1">
-                    {CitesWeather?.location?.city || "Unknown"}
-                    <span className="text-xs  text-shades-5/70">
-                      Good Evening (08:23)
-                    </span>
-                  </h1>
-                </div>
-                <div>
-                  <h1 className=" text-3xl relative pr-2 text-shades-4/90">
-                    31{" "}
-                    <span className="inline text-xs absolute top-0 right-1  text-shades-5/70">
-                      C
-                    </span>
-                    <span className="text-sm block text-shades-5/50">
-                      Sunny
-                    </span>
-                  </h1>
-                </div>
-              </li>{" "}
-              <li className="flex justify-between items-center px-2 py-3  border-shades-5 bg-shades-1/30 text-shades-5/90 rounded-xl ">
-                <div>
-                  <h1 className="text-xl capitalize grid gap-1">
-                    Lakhimpur kheri
-                    <span className="text-xs  text-shades-5/70">
-                      Good Evening (08:23)
-                    </span>
-                  </h1>
-                </div>
-                <div>
-                  <h1 className=" text-3xl relative pr-2 text-shades-4/90">
-                    31{" "}
-                    <span className="inline text-xs absolute top-0 right-1  text-shades-5/70">
-                      C
-                    </span>
-                    <span className="text-sm block text-shades-5/50">
-                      Sunny
-                    </span>
-                  </h1>
-                </div>
-              </li>
+              {CitesWeather.hourly_weather.hourly.slice(0, 2).map((item) => (
+                <li
+                  key={nanoid.apply()}
+                  className="flex justify-between items-center px-2 py-3  border-shades-5 bg-shades-1/30 text-shades-5/90 rounded-xl "
+                >
+                  <div>
+                    <h1 className="text-xl capitalize grid gap-1">
+                      {CitesWeather?.location?.city || "Unknown"}
+                      <span className="text-xs  text-shades-5/70">
+                        {item.dt.wish ?? "-"} ({item.dt.time})
+                      </span>
+                    </h1>
+                  </div>
+                  <div>
+                    <h1 className=" text-3xl relative pr-2 text-shades-4/90">
+                      {item?.weather.temp
+                        ? custm_units.temp == "C"
+                          ? item?.weather.temp.toFixed(0)
+                          : custm_units.temp == "F"
+                          ? ((item?.weather.temp * 9) / 5 + 32).toFixed(0)
+                          : custm_units.temp == "K"
+                          ? (item?.weather.temp + 273.15).toFixed(0)
+                          : "-"
+                        : "-"}{" "}
+                      <span className="inline text-xs absolute top-0 right-1  text-shades-5/70">
+                        {custm_units.temp
+                          ? custm_units.temp == "K"
+                            ? "K"
+                            : custm_units.temp == "C"
+                            ? "°C"
+                            : "°F"
+                          : "-"}
+                      </span>
+                      <span className="text-sm block text-shades-5/50">
+                        Sunny
+                      </span>
+                    </h1>
+                  </div>
+                </li>
+              ))}
             </ul>
           </div>
           <div className="px-2 grid grid-cols-1 grid-rows-3 gap-2 rounded-2xl bg-shades-1/20 text-shades-5/85">
@@ -137,12 +135,28 @@ export default function CitesWeather() {
                     >
                       <span className="text-xs">{item.dt?.time || "-"}</span>
                       <h1 className="text-2xl relative pr-2 text-shades-4/90">
-                        31
+                        {item?.weather.temp
+                          ? custm_units.temp == "C"
+                            ? item?.weather.temp.toFixed(0)
+                            : custm_units.temp == "F"
+                            ? ((item?.weather.temp * 9) / 5 + 32).toFixed(0)
+                            : custm_units.temp == "K"
+                            ? (item?.weather.temp + 273.15).toFixed(0)
+                            : "-"
+                          : "-"}
                         <span className="text-xs absolute top-0 right-0">
-                          C
+                          {custm_units.temp
+                            ? custm_units.temp == "K"
+                              ? "K"
+                              : custm_units.temp == "C"
+                              ? "°C"
+                              : "°F"
+                            : "-"}
                         </span>
                       </h1>
-                      <span className="text-xs text-shades-5/50">Sunny</span>
+                      <span className="text-xs text-shades-5/50">
+                        {item.weather.weather_main ?? "-"}
+                      </span>
                     </li>
                   ))}
               </ul>
@@ -153,14 +167,48 @@ export default function CitesWeather() {
                 <li className="px-4 text-center border rounded-xl border-shades-5/40">
                   <span className="text-xs">Today</span>
                   <h1 className="text-2xl relative pr-2 text-shades-4/90">
-                    {(
-                      (CitesWeather?.week_weather.weekly_data[0].weather
-                        .temperature_2m_max +
-                        CitesWeather?.week_weather.weekly_data[0].weather
-                          .temperature_2m_min) /
-                      2
-                    ).toFixed(0) || "-"}
-                    <span className="text-xs absolute top-0 right-0">C</span>
+                    {CitesWeather?.week_weather.weekly_data[0]?.weather
+                      .temperature_2m_max
+                      ? custm_units.temp == "C"
+                        ? (
+                            (CitesWeather?.week_weather.weekly_data[0].weather
+                              .temperature_2m_max +
+                              CitesWeather?.week_weather.weekly_data[0].weather
+                                .temperature_2m_min) /
+                            2
+                          ).toFixed(0)
+                        : custm_units.temp == "F"
+                        ? (
+                            (((CitesWeather?.week_weather.weekly_data[0].weather
+                              .temperature_2m_max +
+                              CitesWeather?.week_weather.weekly_data[0].weather
+                                .temperature_2m_min) /
+                              2) *
+                              9) /
+                              5 +
+                            32
+                          ).toFixed(0)
+                        : custm_units.temp == "K"
+                        ? (
+                            (CitesWeather?.week_weather.weekly_data[0].weather
+                              .temperature_2m_max +
+                              CitesWeather?.week_weather.weekly_data[0].weather
+                                .temperature_2m_min) /
+                              2 +
+                            273.15
+                          ).toFixed(0)
+                        : "-"
+                      : "-"}{" "}
+                    <span className="text-xs absolute top-0 right-0">
+                      {" "}
+                      {custm_units.temp
+                        ? custm_units.temp == "K"
+                          ? "K"
+                          : custm_units.temp == "C"
+                          ? "°C"
+                          : "°F"
+                        : "-"}
+                    </span>
                   </h1>
                   <span className="text-xs text-shades-5/50">
                     {
@@ -178,13 +226,39 @@ export default function CitesWeather() {
                     >
                       <span className="text-xs">{item.dt.day}</span>
                       <h1 className="text-2xl relative pr-2 text-shades-4/90">
-                        {(
-                          (item.weather.temperature_2m_max +
-                            item.weather.temperature_2m_min) /
-                          2
-                        ).toFixed(0)}
+                        {item?.weather.temperature_2m_max
+                          ? custm_units.temp == "C"
+                            ? (
+                                (item.weather.temperature_2m_max +
+                                  item.weather.temperature_2m_min) /
+                                2
+                              ).toFixed(0)
+                            : custm_units.temp == "F"
+                            ? (
+                                (((item.weather.temperature_2m_max +
+                                  item.weather.temperature_2m_min) /
+                                  2) *
+                                  9) /
+                                  5 +
+                                32
+                              ).toFixed(0)
+                            : custm_units.temp == "K"
+                            ? (
+                                (item.weather.temperature_2m_max +
+                                  item.weather.temperature_2m_min) /
+                                  2 +
+                                273.15
+                              ).toFixed(0)
+                            : "-"
+                          : "-"}
                         <span className="text-xs absolute top-0 right-0">
-                          C
+                          {custm_units.temp
+                            ? custm_units.temp == "K"
+                              ? "K"
+                              : custm_units.temp == "C"
+                              ? "°C"
+                              : "°F"
+                            : "-"}
                         </span>
                       </h1>
                       <span className="text-xs text-shades-5/50 overflow-hidden text-ellipsis w-fite">
@@ -310,9 +384,9 @@ function SearchBox({ setIsFocused, ref }) {
         <MdOutlineCancel />
       </button>
       <select
-        className={`absolute top-full left-0 w-full h-${
+        className={`absolute top-full left-0 w-full z-10 h-${
           addressList.data?.length * 10
-        } bg-shades-1/50 mt-0.5 transition-all duration-200 ease-in-out ${
+        } bg-shades-1/95 mt-0.5 transition-all duration-200 ease-in-out ${
           addressList.succes == 200 ? "inline" : "hidden"
         }`}
         multiple
@@ -328,7 +402,7 @@ function SearchBox({ setIsFocused, ref }) {
         {addressList?.data?.map((item) => (
           <option
             key={nanoid()}
-            className="px-2 py-2 hover:bg-shades-1/60 cursor-pointer transition-all duration-100 ease-in-out active:scale-99"
+            className="px-2 py-2 hover:bg-shades-5/40 cursor-pointer transition-all duration-100 ease-in-out active:scale-99"
             value={item.display_name}
             data_location={JSON.stringify(item)}
             onClick={(e) => {
@@ -336,7 +410,7 @@ function SearchBox({ setIsFocused, ref }) {
               e.target.parentElement.classList.toggle("inline");
               e.target.parentElement.classList.toggle("hidden");
               setInput_location(e.target.attributes.data_location.value);
-              fetch_cite_weather(input_location);
+              fetch_cite_weather(e.target.attributes.data_location.value);
             }}
           >
             {item.display_name}
@@ -346,3 +420,4 @@ function SearchBox({ setIsFocused, ref }) {
     </>
   );
 }
+export { SearchBox };

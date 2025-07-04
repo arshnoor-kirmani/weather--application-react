@@ -7,7 +7,13 @@ export default function Layout() {
   return (
     <main
       className={`main-lg main-md main-mobile ${
-        pathName != "/cites" ? "h-[225dvh]" : "h-[120dvh]"
+        pathName == "/"
+          ? "h-[225dvh]"
+          : pathName == "/cites"
+          ? "h-[120dvh]"
+          : pathName == "/map"
+          ? "h-[170dvh]"
+          : ""
       } bg-shades-5 size-full `}
     >
       <div className=" border size-full rounded-3xl bg-shades-2 p-5 lg:grid grid-cols-[8%_90%] grid-rows-1 gap-5 ">

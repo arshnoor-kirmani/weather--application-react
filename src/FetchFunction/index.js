@@ -88,6 +88,7 @@ async function fetchCurrentWeather(coord, dispatch, Function) {
     const Base_Url = `https://api.open-meteo.com/v1/forecast`;
     // const Base_Url = `./dev_asserts/`;
     //current weather params
+    console.log(coord.lat, coord.lon);
     const params = {
       latitude: coord.lat,
       longitude: coord.lon,
@@ -381,7 +382,6 @@ async function fetchCurrentWeather(coord, dispatch, Function) {
       })
       .finally(() => {
         console.log("SuccesFully Data Fetch");
-        console.log("Fetch", current);
         if (dispatch) {
           let locationData;
           async function getLocationinfo(lat, lon) {
@@ -390,7 +390,6 @@ async function fetchCurrentWeather(coord, dispatch, Function) {
                 `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`
               );
               locationData = response.data;
-              console.log(current.location);
               current.location = {
                 ...current.location,
                 city: locationData?.address.city ?? "N/A",
@@ -401,7 +400,6 @@ async function fetchCurrentWeather(coord, dispatch, Function) {
               console.error(err);
               locationData = null;
             }
-            console.log("location", locationData);
           }
           getLocationinfo(params.latitude, params.longitude).finally(() => {
             dispatch(Function(current));
