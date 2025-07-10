@@ -395,6 +395,7 @@ async function fetchCurrentWeather(coord, dispatch, Function) {
                 city: locationData?.address.city ?? "N/A",
                 country: locationData?.address.country ?? "N/A",
                 country_code: locationData?.address.country_code ?? "N/A",
+                display_name: locationData.display_name,
               };
             } catch (err) {
               console.error(err);

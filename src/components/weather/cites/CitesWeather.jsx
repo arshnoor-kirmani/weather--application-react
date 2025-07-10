@@ -42,7 +42,8 @@ export default function CitesWeather() {
                 >
                   <div>
                     <h1 className="text-xl capitalize grid gap-1">
-                      {CitesWeather?.location?.city || "Unknown"}
+                      {CitesWeather.location?.display_name.split(",")[0] ||
+                        "Unknown"}
                       <span className="text-xs  text-shades-5/70">
                         {item.dt.wish ?? "-"} ({item.dt.time})
                       </span>
@@ -81,7 +82,8 @@ export default function CitesWeather() {
             <div className=" flex justify-between px-2 p-1 text-shades-5/90 border-b-1 border-shades-5/50">
               <div className="size-full flex flex-col justify-center">
                 <h1 className="text-xl">
-                  {CitesWeather?.location?.city || "Unkown"}
+                  {CitesWeather.location?.display_name.split(",")[0] ||
+                    "Unkown"}
                 </h1>
                 <span className="text-xs">
                   {CitesWeather.current_weather?.dt.wish || "-"}

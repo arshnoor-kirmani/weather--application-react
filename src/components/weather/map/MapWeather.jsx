@@ -45,6 +45,7 @@ const OpenStreetMapClick = () => {
   useEffect(() => {
     MapLocationWeather();
   }, [x]);
+  console.log("LocationWeather", LocationWeather);
   return (
     <div className="grid grid-cols-1 grid-rows-1 gap-1 size-full">
       <div className="grid lg:grid-rows-1 grid-rows-2 lg:grid-cols-[68%_30%] gap-4 lg:h-full z-1">
@@ -58,9 +59,8 @@ const OpenStreetMapClick = () => {
             <div className="flex flex-col-reverse justify-center items-center border-b-1 pb-1">
               <div className="self-start">
                 <h1 className="text-shades-5/80 text-2xl">
-                  {LocationWeather?.location?.city != "N/A"
-                    ? LocationWeather?.location?.city
-                    : LocationWeather?.location?.country}
+                  {LocationWeather.location?.display_name.split(",")[0] ||
+                    "Unkown"}
                 </h1>
                 <span className="text-xs ">
                   {LocationWeather.current_weather?.dt.time ?? "-"}
