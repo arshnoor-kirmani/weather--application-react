@@ -21,7 +21,6 @@ export default function CitesWeather() {
   useEffect(() => {
     let uniteSetting = JSON.parse(localStorage.getItem("unite_setting"));
     if (uniteSetting) {
-      console.log(uniteSetting);
       let obj = {
         temp: uniteSetting.temperature == "celsius" ? "C" : "F",
         wind_speed: uniteSetting.speed,
@@ -29,11 +28,9 @@ export default function CitesWeather() {
         precipitation: uniteSetting.precipitation,
         distance: uniteSetting.distance,
       };
-      console.log(obj);
       setUnites(obj);
     }
   }, []);
-  console.log("slice", CitesWeather);
   return (
     <div className="grid grid-cols-1 lg:grid-rows-[10%_90%] grid-rows-[5%_95%] w-full h-fit gap-4">
       <div

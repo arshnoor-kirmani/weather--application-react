@@ -12,7 +12,6 @@ export default function Setting() {
     const preSetting = JSON.parse(localStorage.getItem("unite_setting"));
     if (preSetting) {
       dispatch(setPreSetting(preSetting));
-      // console.log(preSetting);
     } else {
       dispatch(
         setPreSetting({
@@ -73,7 +72,6 @@ function SettingComp({ title, settingValue, dispatch, defultSetting }) {
     elm.classList.add("bg-shades-5/70", "text-shades-1");
     let newSetting = elm.attributes.data_value.value.split(" ");
     dispatch(setSetting(newSetting));
-    console.log(defultSetting);
   }
   return (
     <li className=" gap-0.5 grid">
@@ -83,23 +81,21 @@ function SettingComp({ title, settingValue, dispatch, defultSetting }) {
           settingValue.length ?? 2
         } grid-rows-1 gap-2 bg-shades-2 p-1 text-center rounded-2xl items-center text-shades-5`}
       >
-        {settingValue.map((e) => (
-          <>
-            {" "}
-            <li
-              onClick={(e) => {
-                SettingValueChanger(e);
-              }}
-              className={`${
-                defultSetting[title.toLowerCase()] == e.toLowerCase()
-                  ? "bg-shades-5/70 text-shades-1"
-                  : ""
-              } rounded-2xl  size-full p-1 transition-all duration-200 ease-in-out`}
-              data_value={title + " " + e.toLowerCase()}
-            >
-              {e}
-            </li>
-          </>
+        {settingValue.map((e, i) => (
+          <li
+            key={e}
+            onClick={(e) => {
+              SettingValueChanger(e);
+            }}
+            className={`${
+              defultSetting[title.toLowerCase()] == e.toLowerCase()
+                ? "bg-shades-5/70 text-shades-1"
+                : ""
+            } rounded-2xl  size-full p-1 transition-all duration-200 ease-in-out`}
+            data_value={title + " " + e.toLowerCase()}
+          >
+            {e}
+          </li>
         ))}
       </ul>
     </li>

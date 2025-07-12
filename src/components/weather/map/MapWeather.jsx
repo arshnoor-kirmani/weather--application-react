@@ -53,7 +53,6 @@ const OpenStreetMapClick = () => {
   useEffect(() => {
     MapLocationWeather();
   }, [x]);
-  console.log("LocationWeather", LocationWeather);
   return (
     <div className="grid grid-cols-1 grid-rows-1 gap-1 size-full">
       <div className="grid lg:grid-rows-1 grid-rows-2 lg:grid-cols-[68%_30%] gap-4 lg:h-full z-1">
@@ -111,8 +110,8 @@ const OpenStreetMapClick = () => {
               <ul className="flex justify-evenly items-center">
                 {LocationWeather.hourly_weather.hourly
                   .slice(0, 3)
-                  .map((itme) => (
-                    <li className="text-center">
+                  .map((itme, i) => (
+                    <li className="text-center" key={i}>
                       <span className="text-xs">{itme.dt.time}</span>
                       <h1 className="text-shades-4 relative">
                         {itme?.weather.temp
@@ -146,8 +145,8 @@ const OpenStreetMapClick = () => {
               <ul className="flex justify-evenly items-center">
                 {LocationWeather.week_weather.weekly_data
                   .slice(3, 6)
-                  .map((items) => (
-                    <li className="text-center">
+                  .map((items, i) => (
+                    <li key={i} className="text-center">
                       <span className="text-sm">{items.dt.day ?? "-"}</span>
                       <h1 className="text-shades-4 relative">
                         {items?.weather.temperature_2m_max

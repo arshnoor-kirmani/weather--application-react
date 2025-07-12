@@ -16,7 +16,6 @@ export default function CurrentWeather() {
     precipitation: defaultSetting.precipitation,
     distance: defaultSetting.distance,
   });
-  console.log("weatherData", weatherData);
   useEffect(() => {
     if (!weatherData?.current_weather?.dt?.time) {
       fetchCurrentWeather(
@@ -26,12 +25,9 @@ export default function CurrentWeather() {
         },
         dispatch,
         setCurrentWeather
-      ).finally(() => {
-        console.log("After Function Call", weatherData);
-      });
+      );
       let uniteSetting = JSON.parse(localStorage.getItem("unite_setting"));
       if (uniteSetting) {
-        console.log(uniteSetting);
         let obj = {
           temp: uniteSetting.temperature == "celsius" ? "C" : "F",
           wind_speed: uniteSetting.speed,
@@ -39,12 +35,10 @@ export default function CurrentWeather() {
           precipitation: uniteSetting.precipitation,
           distance: uniteSetting.distance,
         };
-        console.log(obj);
         setUnites(obj);
       }
     }
   }, []);
-  console.log("custm_units", custm_units);
   // useEffect(() => {}, [weatherData]);
   if (weatherData.loading) {
     return (
@@ -398,7 +392,10 @@ export default function CurrentWeather() {
                     .filter((hour, idx) => idx % 3 === 0)
                     .slice(0, 8)
                     .map((hour, index) => (
-                      <li className=" text-center flex flex-col items-center justify-center">
+                      <li
+                        className=" text-center flex flex-col items-center justify-center"
+                        key={index + "Arshnoor"}
+                      >
                         <span className="lg:text-xs md:text-md text-gray-200 capitalize">
                           {hour.dt.day ? hour.dt.time : "-"}
                         </span>
@@ -441,7 +438,10 @@ export default function CurrentWeather() {
                 {weatherData.week_weather.weekly_data
                   .slice(2)
                   .map((item, i) => (
-                    <li className="flex flex-col items-center justify-center bg-shades-1/40 rounded-xl py-2 px-3">
+                    <li
+                      key={i}
+                      className="flex flex-col items-center justify-center bg-shades-1/40 rounded-xl py-2 px-3"
+                    >
                       <span className="lg:text-xs md:text-md text-gray-200 capitalize">
                         {i == 0 ? "Todya" : item?.dt.day ?? "-"}
                       </span>

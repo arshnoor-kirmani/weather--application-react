@@ -88,7 +88,6 @@ async function fetchCurrentWeather(coord, dispatch, Function) {
     const Base_Url = `https://api.open-meteo.com/v1/forecast`;
     // const Base_Url = `./dev_asserts/`;
     //current weather params
-    console.log(coord.lat, coord.lon);
     const params = {
       latitude: coord.lat,
       longitude: coord.lon,

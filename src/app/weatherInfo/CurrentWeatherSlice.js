@@ -12,7 +12,6 @@ const Currentweather = createSlice({
       Object.assign(state, action.payload);
       state.success = true;
       state.loading = false;
-      console.log("Update State", state.current_weather);
     },
   },
 });
