@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchCurrentWeather } from "../../../FetchFunction";
 import { setCurrentWeather } from "../../../app/weatherInfo/CurrentWeatherSlice";
@@ -8,13 +8,15 @@ export default function CurrentWeather() {
   const weatherData = useSelector((state) => state.currentweather);
   // Set your unit_code here, e.g. from props, state, or a selector
   const unit_code = "metric"; // or "standard" or "imperial"/metric
-  const custm_units = {
-    temp: "C",
-    wind_speed: "km/h",
-    pressure: "hpa",
-    precipitation: "mm",
-    distance: "km",
-  };
+  const defaultSetting = useSelector((state) => state.setting);
+  const [custm_units, setUnites] = useState({
+    temp: defaultSetting.temperature == "celsius" ? "C" : "F",
+    wind_speed: defaultSetting.speed,
+    pressure: defaultSetting.pressure,
+    precipitation: defaultSetting.precipitation,
+    distance: defaultSetting.distance,
+  });
+  console.log("weatherData", weatherData);
   useEffect(() => {
     if (!weatherData?.current_weather?.dt?.time) {
       fetchCurrentWeather(
@@ -27,8 +29,22 @@ export default function CurrentWeather() {
       ).finally(() => {
         console.log("After Function Call", weatherData);
       });
+      let uniteSetting = JSON.parse(localStorage.getItem("unite_setting"));
+      if (uniteSetting) {
+        console.log(uniteSetting);
+        let obj = {
+          temp: uniteSetting.temperature == "celsius" ? "C" : "F",
+          wind_speed: uniteSetting.speed,
+          pressure: uniteSetting.pressure,
+          precipitation: uniteSetting.precipitation,
+          distance: uniteSetting.distance,
+        };
+        console.log(obj);
+        setUnites(obj);
+      }
     }
   }, []);
+  console.log("custm_units", custm_units);
   // useEffect(() => {}, [weatherData]);
   if (weatherData.loading) {
     return (
@@ -284,7 +300,7 @@ export default function CurrentWeather() {
                               weatherData.current_weather.weather.wind.speed /
                               3.6
                             ).toFixed(1)
-                          : custm_units.wind_speed == "knot"
+                          : custm_units.wind_speed == "knots"
                           ? (
                               weatherData.current_weather.weather.wind.speed /
                               1.852
@@ -424,19 +440,49 @@ export default function CurrentWeather() {
               <ul className="grid grid-cols-2 md:grid-cols-7 gap-4 p-2">
                 {weatherData.week_weather.weekly_data
                   .slice(2)
-                  .map((itme, i) => (
+                  .map((item, i) => (
                     <li className="flex flex-col items-center justify-center bg-shades-1/40 rounded-xl py-2 px-3">
                       <span className="lg:text-xs md:text-md text-gray-200 capitalize">
-                        {i == 0 ? "Todya" : itme?.dt.day ?? "-"}
+                        {i == 0 ? "Todya" : item?.dt.day ?? "-"}
                       </span>
                       <h2 className="lg:text-xl md:text-2xl relative pr-3 left-1 inline text-shades-4">
-                        30{" "}
+                        {item?.weather.temperature_2m_max
+                          ? custm_units.temp == "C"
+                            ? (
+                                (item.weather.temperature_2m_max +
+                                  item.weather.temperature_2m_min) /
+                                2
+                              ).toFixed(0)
+                            : custm_units.temp == "F"
+                            ? (
+                                (((item.weather.temperature_2m_max +
+                                  item.weather.temperature_2m_min) /
+                                  2) *
+                                  9) /
+                                  5 +
+                                32
+                              ).toFixed(0)
+                            : custm_units.temp == "K"
+                            ? (
+                                (item.weather.temperature_2m_max +
+                                  item.weather.temperature_2m_min) /
+                                  2 +
+                                273.15
+                              ).toFixed(0)
+                            : "-"
+                          : "-"}
                         <span className="text-xs absolute top-0 right-0">
-                          °C
+                          {custm_units.temp
+                            ? custm_units.temp == "K"
+                              ? "K"
+                              : custm_units.temp == "C"
+                              ? "°C"
+                              : "°F"
+                            : "-"}
                         </span>
                       </h2>
                       <span className="lg:text-xs md:text-md text-gray-200 capitalize">
-                        Sunny
+                        {item.weather.weather_main}
                       </span>
                     </li>
                   ))}
