@@ -9,6 +9,14 @@ import { SearchBox } from "../cites/CitesWeather";
 const OpenStreetMapClick = () => {
   const [x, setlocatio] = useState({ lat: 20.5937, lng: 78.9629 });
   const dispatch = useDispatch();
+  const defaultSetting = useSelector((state) => state.setting);
+  const [custm_units, setUnites] = useState({
+    temp: defaultSetting.temperature == "celsius" ? "C" : "F",
+    wind_speed: defaultSetting.speed,
+    pressure: defaultSetting.pressure,
+    precipitation: defaultSetting.precipitation,
+    distance: defaultSetting.distance,
+  });
   const mapRef = useRef(null);
   const [isFocused, setIsFocused] = useState("second");
   const LocationWeather = useSelector((state) => state.mapweather);
@@ -68,9 +76,30 @@ const OpenStreetMapClick = () => {
               </div>
               <div>
                 <h1 className="text-4xl text-shades-4/85">
-                  {LocationWeather.current_weather.weather.temp.toFixed(0) ??
-                    "-"}{" "}
-                  <span className="text-xl">C</span>
+                  {LocationWeather.current_weather?.weather.temp
+                    ? custm_units.temp == "C"
+                      ? LocationWeather.current_weather?.weather.temp.toFixed(0)
+                      : custm_units.temp == "F"
+                      ? (
+                          (LocationWeather.current_weather?.weather.temp * 9) /
+                            5 +
+                          32
+                        ).toFixed(0)
+                      : custm_units.temp == "K"
+                      ? (
+                          LocationWeather.current_weather?.weather.temp + 273.15
+                        ).toFixed(0)
+                      : "-"
+                    : "-" ?? "-"}{" "}
+                  <span className="text-xl">
+                    {custm_units.temp
+                      ? custm_units.temp == "K"
+                        ? "K"
+                        : custm_units.temp == "C"
+                        ? "°C"
+                        : "°F"
+                      : "-"}
+                  </span>
                 </h1>
                 <span className="text-sm text-shades-5/50">
                   {LocationWeather.current_weather.weather.weather_main}
@@ -86,9 +115,23 @@ const OpenStreetMapClick = () => {
                     <li className="text-center">
                       <span className="text-xs">{itme.dt.time}</span>
                       <h1 className="text-shades-4 relative">
-                        {itme.weather.temp.toFixed(0)}{" "}
+                        {itme?.weather.temp
+                          ? custm_units.temp == "C"
+                            ? itme?.weather.temp.toFixed(0)
+                            : custm_units.temp == "F"
+                            ? ((itme?.weather.temp * 9) / 5 + 32).toFixed(0)
+                            : custm_units.temp == "K"
+                            ? (itme?.weather.temp + 273.15).toFixed(0)
+                            : "-"
+                          : "-"}{" "}
                         <span className="text-xs absolute top-0 -right-0.5">
-                          C
+                          {custm_units.temp
+                            ? custm_units.temp == "K"
+                              ? "K"
+                              : custm_units.temp == "C"
+                              ? "°C"
+                              : "°F"
+                            : "-"}
                         </span>
                       </h1>
                       <span className="text-xs">
@@ -107,13 +150,39 @@ const OpenStreetMapClick = () => {
                     <li className="text-center">
                       <span className="text-sm">{items.dt.day ?? "-"}</span>
                       <h1 className="text-shades-4 relative">
-                        {(
-                          (items.weather.temperature_2m_max +
-                            items.weather.temperature_2m_min) /
-                          2
-                        ).toFixed(0)}{" "}
+                        {items?.weather.temperature_2m_max
+                          ? custm_units.temp == "C"
+                            ? (
+                                (items.weather.temperature_2m_max +
+                                  items.weather.temperature_2m_min) /
+                                2
+                              ).toFixed(0)
+                            : custm_units.temp == "F"
+                            ? (
+                                (((items.weather.temperature_2m_max +
+                                  items.weather.temperature_2m_min) /
+                                  2) *
+                                  9) /
+                                  5 +
+                                32
+                              ).toFixed(0)
+                            : custm_units.temp == "K"
+                            ? (
+                                (items.weather.temperature_2m_max +
+                                  items.weather.temperature_2m_min) /
+                                  2 +
+                                273.15
+                              ).toFixed(0)
+                            : "-"
+                          : "-"}
                         <span className="text-xs absolute top-0 -right-0.5">
-                          C
+                          {custm_units.temp
+                            ? custm_units.temp == "K"
+                              ? "K"
+                              : custm_units.temp == "C"
+                              ? "°C"
+                              : "°F"
+                            : "-"}
                         </span>
                       </h1>
                       <span className="text-xs">

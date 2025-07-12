@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { MdOutlineCancel } from "react-icons/md";
 import { IoIosSearch } from "react-icons/io";
 import axios from "axios";
@@ -10,13 +10,29 @@ export default function CitesWeather() {
   const [isFocused, setIsFocused] = useState(false);
   const inputRef = useRef(null);
   const CitesWeather = useSelector((state) => state.citeweather);
-  const custm_units = {
-    temp: "C",
-    wind_speed: "km/h",
-    pressure: "hpa",
-    precipitation: "mm",
-    distance: "km",
-  };
+  const defaultSetting = useSelector((state) => state.setting);
+  const [custm_units, setUnites] = useState({
+    temp: defaultSetting.temperature == "celsius" ? "C" : "F",
+    wind_speed: defaultSetting.speed,
+    pressure: defaultSetting.pressure,
+    precipitation: defaultSetting.precipitation,
+    distance: defaultSetting.distance,
+  });
+  useEffect(() => {
+    let uniteSetting = JSON.parse(localStorage.getItem("unite_setting"));
+    if (uniteSetting) {
+      console.log(uniteSetting);
+      let obj = {
+        temp: uniteSetting.temperature == "celsius" ? "C" : "F",
+        wind_speed: uniteSetting.speed,
+        pressure: uniteSetting.pressure,
+        precipitation: uniteSetting.precipitation,
+        distance: uniteSetting.distance,
+      };
+      console.log(obj);
+      setUnites(obj);
+    }
+  }, []);
   console.log("slice", CitesWeather);
   return (
     <div className="grid grid-cols-1 lg:grid-rows-[10%_90%] grid-rows-[5%_95%] w-full h-fit gap-4">
